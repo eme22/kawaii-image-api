@@ -145,7 +145,7 @@ function createLogin() {
     ).then(
         function (value) {
             if (value == 'yes') {
-                document.location.href = "http://localhost:8000/auth/discord";
+                window.location.href = "/auth/discord";
             }
         },
         function (error) {
