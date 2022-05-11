@@ -1,4 +1,4 @@
 import {User} from './user'
-import {Post} from './post'
-import {Comment} from './comment'
-export {User, Post, Comment}
+import {Result, Error} from './result'
+import {SFW, NSFW, Image} from './image'
+export {User, Result, Error, Image, SFW, NSFW}

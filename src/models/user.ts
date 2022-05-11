@@ -1,31 +1,30 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, UpdateDateColumn} from "typeorm";
-import { Post } from "./post";
-import {Comment} from './comment';
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, UpdateDateColumn, PrimaryColumn} from "typeorm";
+import { Image } from "./image";
 
 @Entity()
 export class User {
 
-    @PrimaryGeneratedColumn()
-    id!: number;
+    @PrimaryColumn()
+    id!: string;
 
     @Column()
-    firstName!: string;
+    name!: string;
 
-    @Column()
-    lastName!: string;
+    @Column({
+        nullable: true
+    })
+    avatar!: string;
 
-    @Column()
-    email!: string;
+    @OneToMany(_type => Image, (image: Image) => image.userId)
+    images!: Array<Image>
 
-    @OneToMany(_type => Post, (post: Post) => post.user)
-    posts!: Array<Post>
-
-    @OneToMany(_type=> Comment, (comment: Comment) => comment.user)
-    comments!: Array<Comment>;
+    @Column({
+        type: 'boolean',
+        default: false
+    })
+    admin!: boolean;
     
     @CreateDateColumn()
     createdAt!: Date;
 
-    @UpdateDateColumn()
-    updatedAt!: Date;
 }

@@ -1,22 +1,30 @@
-import { Get, Route, Tags,  Post, Body, Path } from "tsoa";
+import { Body, Path } from "tsoa";
 import {User} from '../models'
-import {getUsers, createUser, IUserPayload, getUser} from '../repositories/user.repository'
+import {getUsers, createUser, IUserPayload, getUser, getAdmin, setAdmin} from '../repositories/user.repository'
 
-@Route("users")
-@Tags("User")
+//@Route("users")
+//@Tags("User")
 export default class UserController {
-  @Get("/")
+  //@Get("/")
   public async getUsers(): Promise<Array<User>> {
     return getUsers()
   }
 
-  @Post("/")
+  //@Post("/")
   public async createUser(@Body() body: IUserPayload): Promise<User> {
     return createUser(body)
   }
 
-  @Get("/:id")
+  //@Get("/:id")
   public async getUser(@Path() id: string): Promise<User | null> {
-    return getUser(Number(id))
+    return getUser(id)
+  }
+
+  public async getAdmin(): Promise<User> {
+    return getAdmin()
+  }
+
+  public async setAdmin(@Path() id: string): Promise<boolean> {
+    return setAdmin(id)
   }
 }

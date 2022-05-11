@@ -1,19 +1,35 @@
 import express from "express";
-import PingController from "../controllers/ping.controller";
-import PostRouter from "./post.router";
-import UserRouter from "./user.router";
-import CommentRouter from "./comment.router";
+import SFWRouter from "./sfw";
+import NSFWRouter from "./nsfw";
+import UploadRouter from "./upload.router";
+import { SFW, NSFW } from "../models";
 
 const router = express.Router();
 
-router.get("/ping", async (_req, res) => {
-  const controller = new PingController();
-  const response = await controller.getMessage();
-  return res.send(response);
+router.use("/upload", UploadRouter)
+
+router.use("/sfw", SFWRouter)
+router.use("/nsfw", NSFWRouter)
+
+router.get('/user_data', function(req, res) {
+
+  if (req.user === undefined) {
+      res.status(404).json({message: "not logged"});
+  } else {
+      res.json(req.user);
+  }
 });
 
-router.use("/users", UserRouter)
-router.use("/posts", PostRouter)
-router.use("/comments", CommentRouter)
+router.get('/endpoints/sfw', function(_req, res) {
+
+  res.json(Object.values(SFW));
+
+});
+
+router.get('/endpoints/nsfw', function(_req, res) {
+
+  res.json(Object.values(NSFW));
+
+});
 
 export default router;
