@@ -8,7 +8,7 @@ Fast created api for serving SFW and NSFW images backed up from the discord CDN.
 1. Clone the repo
 
    ```sh
-   git clone git@github.com:rsbh/express-typescript.git
+   git clone https://github.com/eme22/kawaii-image-api.git
    cd express-typescript
    ```
 
@@ -33,10 +33,4 @@ Fast created api for serving SFW and NSFW images backed up from the discord CDN.
 
 ```sh
 docker build -t express-typescript .
-```
-
-## Run tests
-
-```sh
-npm test
 ```
