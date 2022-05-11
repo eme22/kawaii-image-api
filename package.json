@@ -1,6 +1,6 @@
 {
   "name": "kawaii-image-api",
-  "version": "0.1",
+  "version": "0.1.0",
   "description": "REST API to serve different images or gifs from animes",
   "main": "index.js",
   "scripts": {
