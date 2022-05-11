@@ -1,13 +1,6 @@
-# express-typescript
+# Waifu Api ![A](public/assets/img/waifu.png)
 
-Source code for the **Building REST API with Express, TypeScript** blog post series
-
-## Post Links
-
-1. [Building REST API with Express, TypeScript and Swagger](https://rsbh.dev/blog/rest-api-with-express-typescript)
-2. [Building REST API with Express, TypeScript - Part 2: Docker Setup](https://rsbh.dev/blog/rest-api-express-typescript-docker)
-3. [Building REST API with Express, TypeScript - Part 3: PostgreSQL and Typeorm](https://rsbh.dev/blog/rest-api-express-postgres-typeorm)
-4. [Building REST API with Express, TypeScript - Part 4: Jest and unit testing](https://rsbh.dev/blog/rest-api-express-typescript-jest-testing)
+Fast created api for serving SFW and NSFW images backed up from the discord CDN. Generated from the **Building REST API with Express, TypeScript** blog post series
 
 ## Build from source
 
