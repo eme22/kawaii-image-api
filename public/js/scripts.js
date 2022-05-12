@@ -100,7 +100,7 @@ window.addEventListener('DOMContentLoaded', event => {
 
     const uploadL = document.getElementById('uploadLink');
     uploadL.addEventListener('click', () => {
-        if (user)
+        if (sessionStorage.user)
             createUploadTest();
         else
             new BsDialogs().ok('Error', 'You must be logged to upload files');
