@@ -15,7 +15,7 @@ import { importx } from "@discordx/importer";
 import { Intents } from "discord.js";
 import { Client } from "discordx";
 import passport from "passport";
-import path from 'node:path';
+import { Strategy as DiscordStrategy, Profile, VerifyCallback /*, Scope*/ } from '@oauth-everything/passport-discord';
 
 require("dotenv").config();
 
@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 8000;
 const app: Application = express();
 const expressSession = require("express-session");
 
-var DiscordStrategy = require('passport-discord').Strategy;
+//var DiscordStrategy = require('passport-discord').Strategy;
 
 var scopes = ['identify'];
 
@@ -41,7 +41,7 @@ const strategy = new DiscordStrategy({
   callbackURL: `${process.env.DISCORD_CALLBACK_URL}`,
   scope: scopes
 },
-  async function(accessToken: string, _refreshToken: string, profile: { id: any; name: any; }, cb: (err: Error | null, user: any) => any) {
+  async function(accessToken: string, _refreshToken: string, profile: Profile, cb: (err: Error | null, user: any) => any) {
   const userRepository = getRepository(User);
   var user = await userRepository.findOne({id: profile.id})
   if (!user) {
