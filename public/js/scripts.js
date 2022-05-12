@@ -73,7 +73,7 @@ window.addEventListener('DOMContentLoaded', event => {
         fetch('/api/v1/sfw/waifu')
             .then(result => result.json())
             .then((output) => {
-                gallery.setAttribute("src", output.link)
+                gallery.setAttribute("src", output.url)
                 if (!output.message) {
                     gallery.style.visibility = "visible";
                 }
@@ -95,7 +95,7 @@ window.addEventListener('DOMContentLoaded', event => {
                 setlogged(out)
             }
         })
-        .catch(err => { notlogged() });
+        .catch(() => { notlogged() });
 
 
     const uploadL = document.getElementById('uploadLink');

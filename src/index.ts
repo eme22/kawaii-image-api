@@ -15,6 +15,7 @@ import { importx } from "@discordx/importer";
 import { Intents } from "discord.js";
 import { Client } from "discordx";
 import passport from "passport";
+import path from 'node:path';
 
 require("dotenv").config();
 
@@ -124,8 +125,10 @@ app.get('/logout', function (req, res) {
 
 app.use(errorHandler)
 
-app.use(function(_req, res, _next) {
-  res.status(404).sendFile('404.html', {root: "public"});
+app.use(function(req, res, _next) {
+  res.statusCode = 404;
+  res.redirect("/404.html");
+  //res.sendFile(path.join(__dirname, '../public', '404.html'));
 });
 
 export const bot = new Client({

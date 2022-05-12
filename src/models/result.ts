@@ -1,5 +1,5 @@
 export class Result {
-    link!: string;
+    url!: string;
 }
 
 export class Error {

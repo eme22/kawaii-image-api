@@ -8,12 +8,12 @@
 		"schemas": {
 			"Result": {
 				"properties": {
-					"link": {
+					"url": {
 						"type": "string"
 					}
 				},
 				"required": [
-					"link"
+					"url"
 				],
 				"type": "object",
 				"additionalProperties": false
