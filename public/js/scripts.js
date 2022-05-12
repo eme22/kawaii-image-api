@@ -172,7 +172,7 @@ function createUploadTest() {
     <div class="mb-3">
     <label for="formFileSm" class="form-label">Small file input example</label>
     <input class="form-control form-control-sm"
-    data-name="file" id="generatedFile" accept=".gif,.jpg,.jpeg,.png" type="file" required>
+    data-name="file" id="generatedFile" accept=".gif,.jpg,.jpeg,.png" type="file" multiple required>
 </div>
 </div>
 <select id="generatedEndpoints" data-name="endpoint" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" required>
@@ -191,18 +191,39 @@ function createUploadTest() {
             var data = document.getElementById('generatedFile').files;
             var endpoint = document.getElementById('generatedEndpoints').value;
 
-            var size = parseFloat(data[0].size / 1024 / 1024).toFixed(2);
-            if (size > 8) {
+            var error = false;
+            for (let index = 0; index < data.length; index++) {
+                var size = parseFloat(data[index].size / 1024 / 1024).toFixed(2);
+                if (size > 8) {
+                    new BsDialogs().ok('Error', 'File must not exceed 8 MB: '+ data[index].name);
+                    error = true;
+                }
+            }
+            if (error) {
                 new BsDialogs().ok('Error', 'File must not exceed 8 MB');
             }
             else {
-                submitData(data[0], endpoint, (success) => {
+                submitData(data, endpoint, (success, failed) => {
                     if (success) {
                         dlg.close()
                         new BsDialogs().ok('Upload Success!', 'You must wait before an admin can aprove your image');
                     }
                     else {
-                        new BsDialogs().ok('Error', 'You must be logged to upload files');
+                        if (failed.length > 0) {
+
+                            var failedb = 'Some of you files couldnt be uploaded, Files: '
+
+                            for (let index = 0; index < failed.length; index++) {
+                                failedb += failed[index] + " ";
+                                
+                            }
+
+                            new BsDialogs().ok('Error',  failedb);
+                        }
+                        else {
+                            new BsDialogs().ok('Error', 'You must be logged to upload files');
+                        }
+                        
                     }
                 })
 
@@ -221,24 +242,39 @@ function createUploadTest() {
 
 }
 
-function submitData(file, endpoint, callback) {
+function submitData(files, endpoint, callback) {
 
 
     if (sessionStorage.user) {
         var user_data = JSON.parse(sessionStorage.user);
         var object_data = JSON.parse(endpoint);
-        var fd = new FormData();
-        fd.append('data', file)
-        fd.append('userId', user_data.id)
-        fd.append('category', object_data.category);
 
-        fetch('api/v1/upload', {
-            method: 'post',
-            body: fd,
-        }).catch(err => {
-            console.log(err);
-        });
-        callback(true);
+        var failed = [];
+
+        for (let index = 0; index < files.length; index++) {
+            const file = files[index];
+
+            var fd = new FormData();
+            fd.append('data', file)
+            fd.append('userId', user_data.id)
+            fd.append('category', object_data.category);
+
+            fetch('api/v1/upload', {
+                method: 'post',
+                body: fd,
+            }).catch(err => {
+                console.log(err);
+                failed.push(file.name);
+            });
+            
+        }
+
+        if (failed.length == 0) {
+            callback(true);
+        } else {
+            callback(false, failed);
+        }
+
     } else {
         callback(false)
     }
