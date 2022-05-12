@@ -100,7 +100,10 @@ window.addEventListener('DOMContentLoaded', event => {
 
     const uploadL = document.getElementById('uploadLink');
     uploadL.addEventListener('click', () => {
-        createUploadTest();
+        if (user)
+            createUploadTest();
+        else
+            new BsDialogs().ok('Error', 'You must be logged to upload files');
     })
 });
 
@@ -249,7 +252,8 @@ function submitData(files, endpoint, callback) {
         var user_data = JSON.parse(sessionStorage.user);
         var object_data = JSON.parse(endpoint);
 
-        var failed = [];
+        var failed = new Array();
+        //var failed = [];
 
         for (let index = 0; index < files.length; index++) {
             const file = files[index];

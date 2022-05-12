@@ -6,8 +6,8 @@ import { Body } from "tsoa";
 export default class UploadController {
 
     //@Post("/")
-    uploadFile(@Body() body: IUploadPayload, buffer: Buffer) {
-        return uploadfile(body, buffer)
+    uploadFile(@Body() body: IUploadPayload, buffer: Buffer, fileName: string) {
+        return uploadfile(body, buffer, fileName)
     }
 
 

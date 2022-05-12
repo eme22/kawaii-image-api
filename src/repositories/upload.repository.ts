@@ -1,4 +1,4 @@
-import { User } from "discord.js";
+import { MessageAttachment, User } from "discord.js";
 import { bot } from "..";
 import { getRepository } from "typeorm";
 import {SFW, NSFW, Image} from '../models'
@@ -10,7 +10,7 @@ export interface IUploadPayload {
     data: File;
 }
 
-export const uploadfile  = async (payload: IUploadPayload, buffer: Buffer) :Promise<Image | null> => {
+export const uploadfile  = async (payload: IUploadPayload, buffer: Buffer, fileName: string) :Promise<Image | null> => {
   
     const imageRepository = getRepository(Image);
 
@@ -25,19 +25,21 @@ export const uploadfile  = async (payload: IUploadPayload, buffer: Buffer) :Prom
       ...image
     })
 
-    await uploadToDiscord(buffer, data);
+    await uploadToDiscord(buffer, data, fileName);
 
     return data;
   }
 
-const uploadToDiscord = async (data: Buffer, payload: Image) : Promise<string> => {
+const uploadToDiscord = async (data: Buffer, payload: Image, fileName: string) : Promise<string> => {
 
     const admin = await getAdmin()
     
+    //console.log("FILENAME: "+ fileName);
+
     bot.users.fetch(admin.id).then((user: User) => {
       user.send({ 
         content: `${payload.id}@${payload.userId}@${payload.category}@${payload.nsfw}`,
-        files: [data] 
+        files: [new MessageAttachment(data, fileName)] 
       });
      });
 

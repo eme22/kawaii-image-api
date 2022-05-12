@@ -8,8 +8,9 @@ router.post("/",FileMiddleware.memoryLoader.single('data'), async (req, res) => 
 
     if (req.user) {
       if (req.file){
+        //console.log(req.file)
         const controller = new UploadController();
-        const response = await controller.uploadFile(req.body, req.file.buffer);
+        const response = await controller.uploadFile(req.body, req.file.buffer, req.file.originalname);
         return res.send(response);
       }
       else{
