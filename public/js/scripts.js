@@ -14,6 +14,8 @@ fetch('/api/v1/endpoints/sfw')
 
 var nsfw;
 
+var uploadDialog;
+
 fetch('/api/v1/endpoints/nsfw')
     .then(res => res.json())
     .then(out => { nsfw = out; })
@@ -21,7 +23,7 @@ fetch('/api/v1/endpoints/nsfw')
         console.log(err);
     })
 
-window.addEventListener('DOMContentLoaded', event => {
+window.addEventListener('DOMContentLoaded', _event => {
 
     if (window.innerWidth < 922) {
         document.body.classList.toggle('sb-sidenav-toggled');
@@ -209,7 +211,8 @@ function createUploadTest() {
                 submitData(data, endpoint, (success, failed) => {
                     if (success) {
                         dlg.close()
-                        new BsDialogs().ok('Uploading...', 'Wait before all the images are uploaded');
+                        uploadDialog = new BsDialogs().custom('Uploading...', 'Wait before all the images are uploaded')
+                        //new BsDialogs().ok('Uploading...', 'Wait before all the images are uploaded');
                     }
                     else {
                         if (failed.length > 0) {
@@ -245,7 +248,7 @@ function createUploadTest() {
 
 }
 
-function submitData(files, endpoint, callback) {
+async function submitData(files, endpoint, callback) {
 
 
     if (sessionStorage.user) {
@@ -254,6 +257,8 @@ function submitData(files, endpoint, callback) {
 
         var failed = new Array();
         //var failed = [];
+
+        let finished = 0;
 
         for (let index = 0; index < files.length; index++) {
             const file = files[index];
@@ -266,8 +271,10 @@ function submitData(files, endpoint, callback) {
             fetch('api/v1/upload', {
                 method: 'post',
                 body: fd,
-            }).then(res => {
-                new BsDialogs().ok('Upload Success'+(index+1)+'/'+(files.length+1)+'!', 'You must wait before an admin can aprove your image');
+            }).then(_res => {
+                finished++;
+                uploadDialog.close()
+                uploadDialog =new BsDialogs().ok('Upload Success'+(finished)+'/'+(files.length+1)+'!', 'You must wait before an admin can aprove your image');
             } ).catch(err => {
                 console.log(err);
                 failed.push(file.name);
