@@ -248,7 +248,7 @@ function createUploadTest() {
 
 }
 
-async function submitData(files, endpoint, callback) {
+function submitData(files, endpoint, callback) {
 
 
     if (sessionStorage.user) {
