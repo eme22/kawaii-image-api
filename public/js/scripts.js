@@ -3,23 +3,43 @@
 // Scripts
 // 
 
+const { default: axios } = require("axios");
+
 var sfw;
 
+axios.get('/api/v1/endpoints/sfw')
+.then(res => res.json())
+.then(out => { sfw = out; })
+.catch(err => {
+    console.log(err);
+})
+
+/*
 fetch('/api/v1/endpoints/sfw')
     .then(res => res.json())
     .then(out => { sfw = out; })
     .catch(err => {
         console.log(err);
     })
+*/
 
 var nsfw;
 
+axios.get('/api/v1/endpoints/nsfw')
+    .then(res => res.json())
+    .then(out => { nsfw = out; })
+    .catch(err => {
+        console.log(err);
+    })
+
+    /*
 fetch('/api/v1/endpoints/nsfw')
     .then(res => res.json())
     .then(out => { nsfw = out; })
     .catch(err => {
         console.log(err);
     })
+*/
 
 window.addEventListener('DOMContentLoaded', _event => {
 
@@ -69,8 +89,7 @@ window.addEventListener('DOMContentLoaded', _event => {
     for (let index = 0; index < 9; index++) {
         const gallery = document.getElementById('gallery' + index);
 
-
-        fetch('/api/v1/sfw/waifu')
+        axios.get('/api/v1/sfw/waifu')
             .then(result => result.json())
             .then((output) => {
                 gallery.setAttribute("src", output.url)
@@ -85,9 +104,35 @@ window.addEventListener('DOMContentLoaded', _event => {
                 gallery.style.visibility = "hidden";
             });
 
+        /*
+        fetch('/api/v1/sfw/waifu')
+            .then(result => result.json())
+            .then((output) => {
+                gallery.setAttribute("src", output.url)
+                if (!output.message) {
+                    gallery.style.visibility = "visible";
+                }
+                else {
+                    gallery.style.visibility = "hidden";
+                }
+            }).catch(err => {
+                console.log(err);
+                gallery.style.visibility = "hidden";
+            });*/
+
 
     }
 
+    axios.get('/api/v1/user_data')
+    .then(res => res.json())
+    .then(out => {
+        if (!out.message) {
+            setlogged(out)
+        }
+    })
+    .catch(() => { notlogged() });
+
+    /*
     fetch('/api/v1/user_data')
         .then(res => res.json())
         .then(out => {
@@ -96,7 +141,7 @@ window.addEventListener('DOMContentLoaded', _event => {
             }
         })
         .catch(() => { notlogged() });
-
+    */
 
     const uploadL = document.getElementById('uploadLink');
     uploadL.addEventListener('click', () => {
@@ -135,9 +180,12 @@ function setlogged(user_data) {
 
 function logout() {
 
+    axios.get('/logout')
+        .then(() => window.location.reload())
+/*
     fetch('/logout')
         .then(() => window.location.reload())
-
+*/
     sessionStorage.removeItem('user')
 }
 
@@ -276,6 +324,24 @@ function submitData(files, endpoint, callback) {
             fd.append('userId', user_data.id)
             fd.append('category', object_data.category);
 
+            axios.post('api/v1/upload', fd, {
+                timeout: 1000
+            }).then(() => {
+                finished++;
+                var header = document.getElementById('generatedUploadingHeader')
+                var body = document.getElementById('generatedUploadingBody')
+
+                if (header && body) {
+                    header.innerHTML = 'Upload Success '+(finished)+'/'+(files.length)+'!'
+                    body.innerHTML = 'You must wait before an admin can aprove your image'
+                }
+                else new BsDialogs().custom('<div id="generatedUploadingHeader">Upload Success '+(finished)+'/'+(files.length)+'!</div>', '<div id="generatedUploadingBody">You must wait before an admin can aprove your image</div>')
+            } ).catch(err => {
+                console.log(err);
+                failed.push(file.name);
+            });
+
+            /*
             fetch('api/v1/upload', {
                 method: 'post',
                 body: fd,
@@ -293,6 +359,7 @@ function submitData(files, endpoint, callback) {
                 console.log(err);
                 failed.push(file.name);
             });
+            */
             
         }
 
