@@ -323,7 +323,7 @@ function submitData(files, endpoint, callback) {
             fd.append('category', object_data.category);
 
             axios.post('api/v1/upload', fd, {
-                timeout: 1000
+                timeout: 1000000
             }).then(() => {
                 finished++;
                 var header = document.getElementById('generatedUploadingHeader')
