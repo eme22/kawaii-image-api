@@ -3,8 +3,6 @@
 // Scripts
 // 
 
-import axios from 'axios';
-
 var sfw;
 
 axios.get('/api/v1/endpoints/sfw')
