@@ -1,5 +1,5 @@
 ![A](public/assets/img/waifu.png)
-# Waifu Api 
+# Kawaii Api 
 
 Fast created api for serving SFW and NSFW images backed up from the discord CDN. Generated from the **Building REST API with Express, TypeScript** blog post series
 
