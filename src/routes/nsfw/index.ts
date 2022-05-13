@@ -1,5 +1,6 @@
 import express from "express";
 
+import AnalRouter from "./anal.router"
 import BjRouter from "./bj.router";
 import BoobsRouter from "./boobs.router";
 import CumRouter from "./cum.router";
@@ -16,6 +17,7 @@ import TrapRouter from "./trap.router";
 
 const NSFWRouter = express.Router();
 
+NSFWRouter.use("/anal", AnalRouter)
 NSFWRouter.use("/bj", BjRouter)
 NSFWRouter.use("/boobs", BoobsRouter)
 NSFWRouter.use("/cum", CumRouter)
