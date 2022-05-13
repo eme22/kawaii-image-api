@@ -7,7 +7,7 @@ var sfw;
 
 axios.get('/api/v1/endpoints/sfw')
 //.then(res => res.json())
-.then(out => { sfw = response.data; })
+.then(response => { sfw = response.data; })
 .catch(err => {
     console.log(err);
 })
@@ -25,7 +25,7 @@ var nsfw;
 
 axios.get('/api/v1/endpoints/nsfw')
 //    .then(res => res.json())
-    .then(out => { nsfw = response.data; })
+    .then(response => { nsfw = response.data; })
     .catch(err => {
         console.log(err);
     })
