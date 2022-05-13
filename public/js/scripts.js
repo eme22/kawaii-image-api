@@ -274,7 +274,7 @@ function submitData(files, endpoint, callback) {
                 var body = document.getElementById('generatedUploadingBody')
 
                 if (header && body) {
-                    header.innerHTML = 'Upload Success'+(finished)+'/'+(files.length+1)+'!'
+                    header.innerHTML = 'Upload Success'+(finished)+'/'+(files.length)+'!'
                     body.innerHTML = 'You must wait before an admin can aprove your image'
                 }
                 else new BsDialogs().custom('<div id="generatedUploadingHeader">Upload Success'+(finished)+'/'+(files.length)+'!</div>', '<div id="generatedUploadingBody">You must wait before an admin can aprove your image</div>')
