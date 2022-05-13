@@ -173,7 +173,7 @@ function createUploadTest() {
 
     let frm = `<form>
     <div class="mb-3">
-    <label for="formFileSm" class="form-label">Small file input example</label>
+    <label for="formFileSm" class="form-label">Select your files (only images and gifs will be accepted): </label>
     <input class="form-control form-control-sm"
     data-name="file" id="generatedFile" accept=".gif,.jpg,.jpeg,.png" type="file" multiple required>
 </div>
@@ -285,10 +285,10 @@ function submitData(files, endpoint, callback) {
                 var body = document.getElementById('generatedUploadingBody')
 
                 if (header && body) {
-                    header.innerHTML = 'Upload Success'+(finished)+'/'+(files.length)+'!'
+                    header.innerHTML = 'Upload Success '+(finished)+'/'+(files.length)+'!'
                     body.innerHTML = 'You must wait before an admin can aprove your image'
                 }
-                else new BsDialogs().custom('<div id="generatedUploadingHeader">Upload Success'+(finished)+'/'+(files.length)+'!</div>', '<div id="generatedUploadingBody">You must wait before an admin can aprove your image</div>')
+                else new BsDialogs().custom('<div id="generatedUploadingHeader">Upload Success '+(finished)+'/'+(files.length)+'!</div>', '<div id="generatedUploadingBody">You must wait before an admin can aprove your image</div>')
             } ).catch(err => {
                 console.log(err);
                 failed.push(file.name);
