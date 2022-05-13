@@ -245,7 +245,7 @@ function createUploadTest() {
 
 }
 
-async function submitData(files, endpoint, callback) {
+function submitData(files, endpoint, callback) {
 
 
     if (sessionStorage.user) {
@@ -265,7 +265,7 @@ async function submitData(files, endpoint, callback) {
             fd.append('userId', user_data.id)
             fd.append('category', object_data.category);
 
-            await fetch('api/v1/upload', {
+            fetch('api/v1/upload', {
                 method: 'post',
                 body: fd,
             }).then(() => {
