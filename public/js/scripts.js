@@ -277,7 +277,7 @@ async function submitData(files, endpoint, callback) {
                     header.innerHTML = 'Upload Success'+(finished)+'/'+(files.length+1)+'!'
                     body.innerHTML = 'You must wait before an admin can aprove your image'
                 }
-                else new BsDialogs().ok('Upload Success'+(finished)+'/'+(files.length+1)+'!', 'You must wait before an admin can aprove your image');
+                else new BsDialogs().custom('<div id="generatedUploadingHeader">Upload Success'+(finished)+'/'+(files.length+1)+'!</div>', '<div id="generatedUploadingBody">You must wait before an admin can aprove your image</div>')
             } ).catch(err => {
                 console.log(err);
                 failed.push(file.name);
