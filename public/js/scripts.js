@@ -103,7 +103,7 @@ window.addEventListener('DOMContentLoaded', _event => {
         if (sessionStorage.user)
             createUploadTest();
         else
-            new BsDialogs().ok('Error', 'You must be logged to upload files');
+            new BsDialogs().ok('Error', 'You must be logged to upload files ');
     })
 });
 
