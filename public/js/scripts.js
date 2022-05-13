@@ -194,16 +194,27 @@ function createUploadTest() {
             var data = document.getElementById('generatedFile').files;
             var endpoint = document.getElementById('generatedEndpoints').value;
 
-            var error = false;
+            if (data.length > 50) {
+                new BsDialogs().ok('Error', 'You cannot submit more than 50 files per upload, let the admins rest a little!');
+                return;
+            }
+
+            var error = new Array();
             for (let index = 0; index < data.length; index++) {
                 var size = parseFloat(data[index].size / 1024 / 1024).toFixed(2);
                 if (size > 8) {
-                    new BsDialogs().ok('Error', 'File must not exceed 8 MB: '+ data[index].name);
-                    error = true;
+                    error.push(data[index].name);
                 }
             }
-            if (error) {
-                new BsDialogs().ok('Error', 'File must not exceed 8 MB');
+            if (error.length > 0) {
+
+                let errBody = 'File must not exceed 8 MB, Files: ';
+
+                for (let index = 0; index < error.length; index++) {
+                    errBody += error[index] +"\n"
+                }
+
+                new BsDialogs().ok('Error', errBody);
             }
             else {
                 submitData(data, endpoint, (success, failed) => {
@@ -217,7 +228,7 @@ function createUploadTest() {
                             var failedb = 'Some of you files couldnt be uploaded, Files: '
 
                             for (let index = 0; index < failed.length; index++) {
-                                failedb += failed[index] + " ";
+                                failedb += failed[index] + "\n";
                                 
                             }
 
