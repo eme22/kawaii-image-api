@@ -209,7 +209,7 @@ function createUploadTest() {
                 submitData(data, endpoint, (success, failed) => {
                     if (success) {
                         dlg.close()
-                        new BsDialogs().ok('Upload Success!', 'You must wait before an admin can aprove your image');
+                        new BsDialogs().ok('Uploading...', 'Wait before all the images are uploaded');
                     }
                     else {
                         if (failed.length > 0) {
@@ -266,7 +266,9 @@ function submitData(files, endpoint, callback) {
             fetch('api/v1/upload', {
                 method: 'post',
                 body: fd,
-            }).catch(err => {
+            }).then(res => {
+                new BsDialogs().ok('Upload Success'+(index+1)+'/'+(files.length+1)+'!', 'You must wait before an admin can aprove your image');
+            } ).catch(err => {
                 console.log(err);
                 failed.push(file.name);
             });
