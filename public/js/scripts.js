@@ -3,8 +3,6 @@
 // Scripts
 // 
 
-const { response } = require("express");
-
 var sfw;
 
 axios.get('/api/v1/endpoints/sfw')
