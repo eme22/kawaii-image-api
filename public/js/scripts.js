@@ -6,7 +6,7 @@
 var sfw;
 
 axios.get('/api/v1/endpoints/sfw')
-.then(res => res.json())
+//.then(res => res.json())
 .then(out => { sfw = out; })
 .catch(err => {
     console.log(err);
@@ -24,7 +24,7 @@ fetch('/api/v1/endpoints/sfw')
 var nsfw;
 
 axios.get('/api/v1/endpoints/nsfw')
-    .then(res => res.json())
+//    .then(res => res.json())
     .then(out => { nsfw = out; })
     .catch(err => {
         console.log(err);
@@ -88,7 +88,7 @@ window.addEventListener('DOMContentLoaded', _event => {
         const gallery = document.getElementById('gallery' + index);
 
         axios.get('/api/v1/sfw/waifu')
-            .then(result => result.json())
+//            .then(result => result.json())
             .then((output) => {
                 gallery.setAttribute("src", output.url)
                 if (!output.message) {
@@ -122,7 +122,7 @@ window.addEventListener('DOMContentLoaded', _event => {
     }
 
     axios.get('/api/v1/user_data')
-    .then(res => res.json())
+//    .then(res => res.json())
     .then(out => {
         if (!out.message) {
             setlogged(out)
