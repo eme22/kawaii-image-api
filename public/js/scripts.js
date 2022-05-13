@@ -3,7 +3,7 @@
 // Scripts
 // 
 
-const { default: axios } = require("axios");
+import axios from 'axios';
 
 var sfw;
 
