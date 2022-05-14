@@ -6,7 +6,7 @@ const router = express.Router();
 router.get("/", async (_req, res) => {
   const controller = new AnalController();
   const response = await controller.getRandomAnal();
-  if (!response) res.status(404).send({message: "No image found"})
+  if (!response) return res.status(404).send({message: "There are no images in this endpoint"})
   return res.send(response);
 });
 

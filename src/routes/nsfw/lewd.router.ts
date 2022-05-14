@@ -6,6 +6,7 @@ const router = express.Router();
 router.get("/", async (_req, res) => {
   const controller = new LewdController();
   const response = await controller.getRandomLewd();
+  if (!response) return res.status(404).send({message: "There are no images in this endpoint"})
   return res.send(response);
 });
 
