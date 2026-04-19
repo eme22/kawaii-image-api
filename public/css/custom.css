@@ -257,14 +257,20 @@ h1, h2, h3, h4, .navbar-brand {
     overflow: hidden;
     background: #f7e8ef;
     position: relative;
-    height: 280px; /* Consistent height for all images */
+    /* Removed fixed height to allow full image height */
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .kawaii-card img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    max-height: 500px; /* Prevent excessively tall images */
+    object-fit: contain; /* Show the full image */
     transition: transform 0.45s ease;
+    display: block;
 }
 
 .kawaii-card:hover img {
