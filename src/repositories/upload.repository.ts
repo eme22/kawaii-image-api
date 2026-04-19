@@ -2,6 +2,7 @@ import { AttachmentBuilder } from "discord.js";
 import { db } from "../db/index.js";
 import { images, nsfwEnum } from "../db/schema.js";
 import { getAdmin } from "./user.repository.js";
+import { eq } from "drizzle-orm";
 
 export interface IUploadPayload {
     userId: string;
@@ -31,21 +32,27 @@ export const uploadfile = async (payload: IUploadPayload, buffer: Buffer, fileNa
     return data;
 };
 
-const uploadToDiscord = async (data: Buffer, payload: any, fileName: string, bot: any): Promise<string> => {
+const uploadToDiscord = async (data: Buffer, payload: any, fileName: string, bot: any): Promise<void> => {
     const admin = await getAdmin();
-    if (!admin) return "";
+    if (!admin) return;
     
     try {
         const user = await bot.users.fetch(admin.id);
         if (user) {
-            await user.send({ 
+            const message = await user.send({ 
                 content: `${payload.id}@${payload.userId}@${payload.category}@${payload.nsfw}`,
                 files: [new AttachmentBuilder(data, { name: fileName })] 
             });
+
+            // Store the IDs in the database for later retrieval
+            await db.update(images)
+                .set({
+                    discordMessageId: message.id,
+                    adminId: admin.id
+                })
+                .where(eq(images.id, payload.id));
         }
     } catch (error) {
         console.error("Failed to send upload notification to admin:", error);
     }
-
-    return `${admin.id}`;
 };

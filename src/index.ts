@@ -115,7 +115,7 @@ const bot = new Client({
     partials: [Partials.Channel, Partials.Message, Partials.Reaction, Partials.User],
 });
 
-bot.once("ready", () => {
+bot.once("clientReady", () => {
     console.log(`Bot started as ${bot.user?.tag}`);
 });
 
@@ -134,7 +134,7 @@ await server.register(fastifyStatic, {
 
 await server.register(imageRoutes, { prefix: "/api/v1" });
 await server.register(userRoutes, { prefix: "/api/v1" });
-await server.register(adminRoutes, { prefix: "/api/v1" });
+await server.register(adminRoutes, { prefix: "/api/v1", bot });
 await server.register(uploadRoutes, { prefix: "/api/v1", bot });
 
 

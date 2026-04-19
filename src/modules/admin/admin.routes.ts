@@ -6,15 +6,21 @@ const IdParamSchema = z.object({
     id: z.string().regex(/^\d+$/).transform(Number)
 });
 
-export async function adminRoutes(fastify: FastifyInstance) {
+export async function adminRoutes(fastify: FastifyInstance, options: any) {
+    const { bot } = options;
 
     fastify.get("/admin/pending", {
         schema: {
             tags: ["Admin"],
-            description: "Get all pending images"
+            description: "Get all pending images with pagination",
+            querystring: z.object({
+                page: z.string().optional().default("1").transform(Number),
+                limit: z.string().optional().default("10").transform(Number)
+            })
         }
-    }, async () => {
-        return await getPendingImages();
+    }, async (request) => {
+        const { page, limit } = request.query as any;
+        return await getPendingImages(bot, page, limit);
     });
 
     fastify.post("/admin/approve/:id", {

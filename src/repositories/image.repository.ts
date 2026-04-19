@@ -125,12 +125,46 @@ export const createImage = async (payload: IImagePayload, nsfw: boolean, categor
 };
 
 /**
- * Gets all images pending for approval.
+ * Gets all images pending for approval from the bot/database with pagination.
  */
-export const getPendingImages = async () => {
-    return await db.select()
+export const getPendingImages = async (bot: any, page: number = 1, limit: number = 10) => {
+    const offset = (page - 1) * limit;
+
+    const pending = await db.select()
         .from(images)
-        .where(eq(images.aproved, false));
+        .where(eq(images.aproved, false))
+        .limit(limit)
+        .offset(offset);
+
+    const result = await Promise.all(pending.map(async (img) => {
+        // Check Redis cache first to avoid redundant Discord API calls
+        const cacheKey = `pending_url:${img.id}`;
+        const cached = await redis.get(cacheKey);
+        if (cached) return { ...img, link: cached };
+
+        // If not in cache and we have the necessary Discord IDs, fetch from bot
+        if (img.adminId && img.discordMessageId) {
+            try {
+                const admin = await bot.users.fetch(img.adminId);
+                const dmChannel = admin.dmChannel || await admin.createDM();
+                const message = await dmChannel.messages.fetch(img.discordMessageId);
+                const attachment = message.attachments.at(0);
+                
+                if (attachment) {
+                    const url = attachment.url;
+                    // Cache for 24 hours (Discord URLs typically last a while but refresh is needed)
+                    await redis.setex(cacheKey, 86400, url); 
+                    return { ...img, link: url };
+                }
+            } catch (error) {
+                console.error(`Failed to fetch pending image ${img.id} from Discord:`, error);
+            }
+        }
+        
+        return img;
+    }));
+
+    return result;
 };
 
 /**

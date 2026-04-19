@@ -29,6 +29,8 @@ export const images = pgTable("image", {
     category: text("category").notNull(), // Using text to allow both enums easily
     aproved: boolean("aproved").default(false).notNull(),
     link: text("link").notNull(),
+    discordMessageId: text("discord_message_id"),
+    adminId: text("admin_id"),
 });
 
 // Relationships
