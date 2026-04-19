@@ -50,7 +50,7 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
                                 Docs
                             </a>
-                            <a class="nav-link btn" id="uploadLink" data-bs-toggle="modal">
+                            <a class="nav-link btn" id="uploadLink">
                                 <div class="sb-nav-link-icon"><i class="fa fa-upload"></i></div>
                                 Upload
                             </a>
@@ -72,21 +72,22 @@
                 <main>
                     <div class="container-fluid px-4">
                         
-                        <!-- Admin Section (Hidden by default) -->
+                        <!-- Admin Section -->
                         <div id="admin-panel" class="mb-4 d-none">
-                            <div class="card border-primary">
-                                <div class="card-header bg-primary text-white">
-                                    <i class="fas fa-shield-halved"></i> Admin Moderation
+                            <div class="card kawaii-card border-primary">
+                                <div class="card-header bg-primary text-white py-3">
+                                    <h5 class="mb-0"><i class="fas fa-shield-halved me-2"></i> Admin Moderation</h5>
                                 </div>
-                                <div class="card-body">
-                                    <p>Review and approve pending uploads.</p>
-                                    <button class="btn btn-primary" id="view-pending-images">View Pending Images</button>
+                                <div class="card-body py-4">
+                                    <p class="text-main mb-3">Review and approve pending uploads to keep the API clean and safe.</p>
+                                    <button class="btn btn-primary btn-kawaii" id="view-pending-images">
+                                        <i class="fas fa-eye me-2"></i> View Pending Images
+                                    </button>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row" id="image-gallery">
-                            <!-- Images will be injected here dynamically -->
                             <div class="col-12 text-center py-5">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>

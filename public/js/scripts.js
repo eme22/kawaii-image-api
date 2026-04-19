@@ -103,6 +103,11 @@ function createCategoryLink(type, category) {
     
     a.addEventListener('click', (e) => {
         e.preventDefault();
+        
+        // Highlight active link
+        document.querySelectorAll('.category-link').forEach(l => l.classList.remove('active'));
+        a.classList.add('active');
+        
         loadGallery(type, category);
         if (window.innerWidth < 992) {
             document.body.classList.add('sb-sidenav-toggled');
@@ -193,7 +198,13 @@ async function loadGallery(type, category) {
         });
         
         if (gallery.innerHTML === '') {
-            gallery.innerHTML = '<div class="col-12 text-center py-5"><h3>No images found in this category.</h3></div>';
+            gallery.innerHTML = `
+                <div class="col-12 text-center py-5 fade-in">
+                    <div class="mb-4" style="font-size: 5rem;">🌸</div>
+                    <h3 class="text-main">No images found in this category yet.</h3>
+                    <p class="text-muted">Be the first one to upload something cute!</p>
+                </div>
+            `;
         }
     } catch (err) {
         gallery.innerHTML = '<div class="col-12 text-center py-5 text-danger"><h3>Error loading gallery.</h3></div>';
@@ -202,7 +213,7 @@ async function loadGallery(type, category) {
 
 function renderImageCard(container, url) {
     const col = document.createElement('div');
-    col.className = 'col-sm-6 col-md-4 col-lg-3 mb-4';
+    col.className = 'col-sm-6 col-md-4 col-lg-3 mb-4 fade-in';
     col.innerHTML = `
         <div class="card kawaii-card h-100">
             <div class="kawaii-card-img-wrapper">
@@ -341,4 +352,63 @@ async function moderateImage(id, action) {
     } catch (err) {
         alert(`Failed to ${action} image.`);
     }
+}
+
+async function createUploadTest() {
+    const dialog = new BsDialogs();
+    
+    let categoriesHtml = sfwCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+    
+    const formHtml = `
+        <form id="upload-form">
+            <div class="mb-3">
+                <label class="form-label">Category</label>
+                <select class="form-select" name="category" required>
+                    ${categoriesHtml}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Image File</label>
+                <input type="file" class="form-control" name="image" accept="image/*" required>
+            </div>
+            <div class="small text-muted">
+                Note: Uploaded images will be reviewed by administrators.
+            </div>
+        </form>
+    `;
+
+    dialog.form("Upload Kawaii Image", "Upload Now", formHtml);
+    
+    // Customize the behavior for file upload
+    const form = document.body.querySelector('#upload-form');
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const okBtn = document.querySelector('.modal-footer .btn-primary');
+        const originalText = okBtn.textContent;
+        okBtn.disabled = true;
+        okBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Uploading...';
+
+        try {
+            const formData = new FormData();
+            formData.append('image', form.image.files[0]);
+            formData.append('category', form.category.value);
+            formData.append('userId', currentUser.id);
+
+            const res = await axios.post('/api/v1/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            if (res.data.success) {
+                dialog.close();
+                const successDialog = new BsDialogs();
+                await successDialog.ok("Success!", "Image uploaded successfully and is now pending approval.");
+            }
+        } catch (err) {
+            console.error("Upload failed:", err);
+            alert("Failed to upload image. Please try again.");
+            okBtn.disabled = false;
+            okBtn.textContent = originalText;
+        }
+    };
 }
