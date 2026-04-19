@@ -2,6 +2,7 @@ import { db } from "../db/index.js";
 import { images, users } from "../db/schema.js";
 import { eq, and, sql } from "drizzle-orm";
 import { redis } from "../config/redis.js";
+import { refreshDiscordUrl } from "../utils/discord.util.js";
 
 export interface IImagePayload {
     userId: string;
@@ -35,42 +36,59 @@ export const getRandomImage = async (category: string) => {
 
         if (results.length === 0) return null;
 
-        // Push all but the first one to Redis
-        const links = results.map(img => img.link);
-        imageLink = links[0];
+        // Push all but the first one to Redis (store as JSON string containing ID and original link)
+        const entries = results.map(img => JSON.stringify({ id: img.id, link: img.link }));
+        const firstEntry = JSON.parse(entries[0]);
         
-        if (links.length > 1) {
-            await redis.rpush(cacheKey, ...links.slice(1));
+        if (entries.length > 1) {
+            await redis.rpush(cacheKey, ...entries.slice(1));
             await redis.expire(cacheKey, 3600); // 1 hour pool TTL
         }
+        
+        return { url: await getFreshUrl(firstEntry.link, firstEntry.id) };
     }
 
-    // Return in the format the frontend expects (Result)
-    return { url: imageLink };
+    const { id, link } = JSON.parse(imageLink);
+    return { url: await getFreshUrl(link, id) };
 };
 
 /**
- * Gets an image by ID.
+ * Gets a fresh URL for a Discord link, using Redis as a cache.
  */
-export const getImageById = async (id: number, category: string) => {
+async function getFreshUrl(url: string, id: number): Promise<string> {
+    const cacheKey = `refreshed_url:${id}`;
+    const cached = await redis.get(cacheKey);
+    if (cached) return cached;
+
+    const [refreshed] = await refreshDiscordUrl([url]);
+    if (refreshed) {
+        await redis.setex(cacheKey, 82800, refreshed); // 23h
+        return refreshed;
+    }
+    return url;
+}
+
+/**
+ * Gets an image by ID. Category is optional.
+ */
+export const getImageById = async (id: number, category?: string) => {
     const cacheKey = `image:${id}`;
     const cached = await redis.get(cacheKey);
     if (cached) return JSON.parse(cached);
 
+    const conditions = [eq(images.id, id), eq(images.aproved, true)];
+    if (category) conditions.push(eq(images.category, category));
+
     const [image] = await db.select()
         .from(images)
-        .where(
-            and(
-                eq(images.id, id),
-                eq(images.category, category),
-                eq(images.aproved, true)
-            )
-        )
+        .where(and(...conditions))
         .limit(1);
 
     if (image) {
-        await redis.setex(cacheKey, 3600, JSON.stringify({ url: image.link }));
-        return { url: image.link };
+        const freshUrl = await getFreshUrl(image.link, image.id);
+        const result = { ...image, url: freshUrl };
+        await redis.setex(cacheKey, 3600, JSON.stringify(result));
+        return result;
     }
     return null;
 };
