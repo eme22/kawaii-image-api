@@ -30,6 +30,10 @@ class BsDialogs {
         this._modal_footer = this._modal_div.querySelector('div.modal-footer')
         this._modal_close = this._modal_div.querySelector('button.btn-close')
         document.body.appendChild(this._modal_div)
+
+        this._modal_div.addEventListener('hidden.bs.modal', () => {
+            this.close()
+        })
     }
 
     _modal_html() {
@@ -52,7 +56,7 @@ class BsDialogs {
         }
 
 
-        let close_btn = `<button type="button" class="btn-close" data-ret="" aria-label="Close"></button>`
+        let close_btn = `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`
         if (!this._options.close) {
             close_btn = ''
         }
@@ -210,10 +214,12 @@ class BsDialogs {
     }
 
     close() {
+        if (!this._modal_div || !this._modal_div.parentNode) return;
         try {
-            this._modal_bs.hide()
+            if (this._modal_bs) this._modal_bs.hide()
             this._modal_div.remove()
-        } catch {
+        } catch (e) {
+            console.warn("Error closing modal:", e);
         }
     }
 
