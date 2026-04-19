@@ -1,0 +1,444 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+:root {
+    --primary-color: #ff5d8f;
+    --primary-hover: #ff3c78;
+    --secondary-color: #e0b1cb;
+    --accent-color: #bde0fe;
+    --bg-light: #fdf2f5;
+    --sidebar-dark: #121225;
+    --card-bg: #ffffff;
+    --text-main: #2d3436;
+    --text-muted: #636e72;
+    --shadow-soft: 0 10px 30px rgba(255, 93, 143, 0.1);
+    --shadow-vibrant: 0 15px 35px rgba(255, 93, 143, 0.2);
+    --border-radius: 1.25rem;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .navbar-brand {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+
+/* Position sidebar below the fixed topbar */
+#layoutSidenav_nav {
+    top: 68px !important;
+    height: calc(100vh - 68px) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Remove the old padding-top hack — no longer needed */
+#layoutSidenav_nav .sb-sidenav {
+    padding-top: 0;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.sb-sidenav {
+    background-color: var(--sidebar-dark) !important;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
+}
+
+.sb-sidenav-dark .sb-sidenav-menu .nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    padding: 0.65rem 1.25rem;
+    margin: 0.15rem 0.6rem;
+    border-radius: 0.875rem;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.sb-sidenav-dark .sb-sidenav-menu .nav-link:hover {
+    color: #fff;
+    background-color: rgba(255, 93, 143, 0.15);
+}
+
+.sb-sidenav-dark .sb-sidenav-menu .nav-link.active {
+    color: #fff;
+    background-color: var(--primary-color);
+}
+
+.sb-sidenav-dark .sb-sidenav-menu .nav-link .sb-nav-link-icon {
+    color: var(--primary-color);
+    margin-right: 0.65rem;
+    width: 16px;
+    text-align: center;
+}
+
+.sb-sidenav-menu-heading {
+    color: rgba(255, 255, 255, 0.3) !important;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+    padding: 1.1rem 1.5rem 0.4rem;
+}
+
+.sb-sidenav-footer {
+    padding: 0.75rem 1rem;
+    background-color: rgba(0, 0, 0, 0.25) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sb-sidenav-footer .small {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06rem;
+    margin-bottom: 0.2rem;
+}
+
+#username {
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============================================
+   NAVBAR
+   ============================================ */
+
+.sb-topnav {
+    background: var(--card-bg) !important;
+    padding-left: 1rem;
+    padding-right: 1.5rem;
+    height: 68px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(255, 93, 143, 0.1);
+}
+
+.navbar-brand {
+    color: var(--primary-color) !important;
+    font-size: 1.35rem;
+    letter-spacing: -0.5px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.btn-link#sidebarToggle {
+    color: var(--primary-color);
+    background: rgba(255, 93, 143, 0.1);
+    border-radius: 0.75rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: 2px solid rgba(255, 93, 143, 0.35);
+    font-size: 1rem;
+}
+
+.btn-link#sidebarToggle:hover {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+/* --- Navbar user/login button --- */
+
+.sb-topnav .nav-link.dropdown-toggle {
+    background: var(--primary-color);
+    color: #fff !important;
+    border-radius: 2rem;
+    padding: 0.4rem 1.1rem !important;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.sb-topnav .nav-link.dropdown-toggle::after {
+    display: none; /* hide default caret */
+}
+
+.sb-topnav .nav-link.dropdown-toggle:hover {
+    background: var(--primary-hover);
+    transform: scale(1.04);
+}
+
+.sb-topnav .dropdown-menu {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    padding: 0.5rem;
+    min-width: 180px;
+    overflow: hidden;
+}
+
+.sb-topnav .dropdown-item {
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.6rem 1rem;
+    color: var(--text-main);
+    transition: all 0.15s ease;
+}
+
+.sb-topnav .dropdown-item:hover {
+    background: rgba(255, 93, 143, 0.1);
+    color: var(--primary-color);
+}
+
+/* ============================================
+   MASCOT LOGO (fixed size)
+   ============================================ */
+
+.mascot-brand {
+    height: 32px;
+    width: 32px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--secondary-color);
+    background: #fff;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+
+#layoutSidenav_content main {
+    padding-top: 1.25rem;
+    min-height: calc(100vh - 68px - 64px);
+}
+
+#layoutSidenav_content > footer {
+    background: var(--card-bg) !important;
+    border-top: 1px solid rgba(255, 93, 143, 0.08);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* ============================================
+   GALLERY CARDS
+   ============================================ */
+
+.kawaii-card {
+    border-radius: var(--border-radius);
+    background: var(--card-bg);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255, 93, 143, 0.08);
+}
+
+.kawaii-card:hover {
+    transform: translateY(-7px);
+    box-shadow: var(--shadow-vibrant);
+    border-color: rgba(255, 93, 143, 0.3);
+}
+
+.kawaii-card-img-wrapper {
+    overflow: hidden;
+    background: #f7e8ef;
+}
+
+.kawaii-card img {
+    transition: transform 0.45s ease;
+}
+
+.kawaii-card:hover img {
+    transform: scale(1.06);
+}
+
+.kawaii-card-actions {
+    padding: 0.85rem;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+.btn-kawaii {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 2rem;
+    padding: 0.45rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.82rem;
+    transition: all 0.2s ease;
+}
+
+.btn-kawaii:hover {
+    background-color: var(--primary-hover);
+    color: #fff;
+    transform: scale(1.04);
+    box-shadow: 0 4px 15px rgba(255, 93, 143, 0.35);
+}
+
+/* ============================================
+   ADMIN PANEL
+   ============================================ */
+
+#admin-panel .card {
+    border-radius: var(--border-radius);
+    border: 2px dashed var(--primary-color) !important;
+    background: #fffafa;
+}
+
+#admin-panel .card-header {
+    border-radius: calc(var(--border-radius) - 2px) calc(var(--border-radius) - 2px) 0 0 !important;
+    font-weight: 600;
+    background: var(--primary-color) !important;
+    border-bottom: none !important;
+}
+
+/* ============================================
+   SPINNERS & BADGES
+   ============================================ */
+
+.spinner-border.text-primary {
+    color: var(--primary-color) !important;
+}
+
+/* ============================================
+   ERROR PAGES
+   ============================================ */
+
+body.error-page {
+    background: linear-gradient(135deg, #fdf2f5 0%, #f3e8ff 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+.error-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.error-nav {
+    background: var(--card-bg);
+    padding: 0 1.5rem;
+    height: 68px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(255, 93, 143, 0.1);
+    display: flex;
+    align-items: center;
+}
+
+.error-nav-brand {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.error-nav-brand img {
+    height: 32px;
+    width: 32px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--secondary-color);
+}
+
+.error-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.error-card {
+    background: #fff;
+    border-radius: 2rem;
+    box-shadow: 0 20px 60px rgba(255, 93, 143, 0.12);
+    padding: 3rem 2.5rem;
+    text-align: center;
+    max-width: 520px;
+    width: 100%;
+    border: 1px solid rgba(255, 93, 143, 0.1);
+}
+
+.error-code {
+    font-family: 'Outfit', sans-serif;
+    font-size: 7rem;
+    font-weight: 700;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--primary-color), #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.error-image {
+    max-height: 180px;
+    width: auto;
+    margin: 0 auto 1.5rem;
+    display: block;
+    border-radius: 1rem;
+}
+
+.error-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}
+
+.error-description {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.error-footer {
+    background: var(--card-bg);
+    border-top: 1px solid rgba(255, 93, 143, 0.08);
+    padding: 1.25rem 2rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 991.98px) {
+    .sb-topnav { padding-right: 0.5rem; }
+    .error-code { font-size: 5rem; }
+    .error-card { padding: 2rem 1.5rem; }
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR
+   ============================================ */
+
+::-webkit-scrollbar { width: 7px; }
+::-webkit-scrollbar-track { background: #f5f5f5; }
+::-webkit-scrollbar-thumb { background: var(--secondary-color); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }

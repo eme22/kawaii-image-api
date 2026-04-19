@@ -13,20 +13,26 @@
         <link rel="icon" href="/favicon.ico">
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
         <link href="css/styles.css" rel="stylesheet" />
+        <link href="css/custom.css" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
     </head>
     <body class="sb-nav-fixed sb-sidenav-toggled">
-        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <nav class="sb-topnav navbar navbar-expand">
             <!-- Sidebar Toggle-->
             <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
             <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3">Kawaii Api</a>
+            <a class="navbar-brand ps-3" href="/">
+                <img src="/assets/img/waifu.png" alt="Logo" class="mascot-brand">
+                Kawaii Api
+            </a>
             <!-- Navbar-->
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0"">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user me-1"></i> Account
+                    </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a id="usermenu-action" class="dropdown-item btn" data-bs-toggle="modal" data-bs-target="#staticBackdrop" href="#!">Logout</a></li>
+                        <li><a id="usermenu-action" class="dropdown-item" href="#!">Login with Discord</a></li>
                     </ul>
                 </li>
             </ul>
@@ -56,9 +62,9 @@
                     </div>
                     <div class="sb-sidenav-footer">
                         <div class="small">Logged in as:</div>
-                            <div class="row justify-content-md-center small" id="username">
-                                Not Logged
-                            </div>
+                        <div class="small fw-bold text-white px-2" id="username">
+                            Not Logged
+                        </div>
                     </div>
                 </nav>
             </div>

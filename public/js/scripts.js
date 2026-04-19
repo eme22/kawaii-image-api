@@ -204,10 +204,14 @@ function renderImageCard(container, url) {
     const col = document.createElement('div');
     col.className = 'col-sm-6 col-md-4 col-lg-3 mb-4';
     col.innerHTML = `
-        <div class="card h-100 shadow-sm">
-            <img src="${url}" class="card-img-top img-fluid rounded" alt="Kawaii Image" style="object-fit: cover; height: 250px;" loading="lazy">
-            <div class="card-body p-2 text-center">
-                <a href="${url}" target="_blank" class="btn btn-sm btn-outline-primary">View Full</a>
+        <div class="card kawaii-card h-100">
+            <div class="kawaii-card-img-wrapper">
+                <img src="${url}" class="card-img-top img-fluid" alt="Kawaii Image" style="object-fit: cover; height: 250px;" loading="lazy">
+            </div>
+            <div class="kawaii-card-actions text-center">
+                <a href="${url}" target="_blank" class="btn btn-kawaii btn-sm">
+                    <i class="fas fa-expand-arrows-alt me-1"></i> View Full
+                </a>
             </div>
         </div>
     `;
@@ -298,15 +302,21 @@ function renderAdminCard(container, img) {
     const col = document.createElement('div');
     col.className = 'col-md-6 col-lg-4 mb-4';
     col.innerHTML = `
-        <div class="card h-100 border-warning shadow-sm" id="admin-card-${img.id}">
-            <img src="${img.link}" class="card-img-top" alt="Pending" style="object-fit: contain; height: 200px; background: #eee;">
+        <div class="card kawaii-card h-100 border-warning" id="admin-card-${img.id}">
+            <div class="kawaii-card-img-wrapper">
+                <img src="${img.link}" class="card-img-top" alt="Pending" style="object-fit: contain; height: 200px; background: #eee;">
+            </div>
             <div class="card-body">
-                <p class="small mb-1"><strong>ID:</strong> ${img.id}</p>
-                <p class="small mb-1"><strong>Category:</strong> ${img.category} (${img.nsfw ? 'NSFW' : 'SFW'})</p>
-                <p class="small mb-2"><strong>User:</strong> ${img.userId}</p>
-                <div class="d-flex justify-content-between">
-                    <button class="btn btn-success btn-sm approve-btn" data-id="${img.id}">Approve</button>
-                    <button class="btn btn-danger btn-sm reject-btn" data-id="${img.id}">Reject</button>
+                <p class="small mb-1"><span class="badge bg-secondary">ID: ${img.id}</span></p>
+                <p class="small mb-1"><strong>Category:</strong> ${img.category} <span class="badge ${img.nsfw ? 'bg-danger' : 'bg-success'}">${img.nsfw ? 'NSFW' : 'SFW'}</span></p>
+                <p class="small mb-3 text-muted"><i class="fas fa-user me-1"></i> ${img.userId}</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                    <button class="btn btn-success btn-sm approve-btn px-3" data-id="${img.id}">
+                        <i class="fas fa-check me-1"></i> Approve
+                    </button>
+                    <button class="btn btn-danger btn-sm reject-btn px-3" data-id="${img.id}">
+                        <i class="fas fa-times me-1"></i> Reject
+                    </button>
                 </div>
             </div>
         </div>
