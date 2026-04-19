@@ -146,9 +146,12 @@ function setLogged(user) {
 }
 
 function setNotLogged() {
+    currentUser = null;
     const loginBtn = document.getElementById('usermenu-action');
-    loginBtn.textContent = 'Login with Discord';
-    loginBtn.dataset.action = 'login';
+    if (loginBtn) {
+        loginBtn.textContent = 'Login with Discord';
+        loginBtn.dataset.action = 'login';
+    }
     document.getElementById('username').textContent = 'Not Logged';
     document.getElementById('admin-panel').classList.add('d-none');
 }
@@ -164,13 +167,18 @@ function setupAuthListeners() {
         }
     });
 
-    document.getElementById('uploadLink').addEventListener('click', () => {
-        if (!currentUser) {
-            alert("You must be logged in to upload!");
-            return;
+    // Use event delegation for the upload link since it gets cloned/replaced
+    document.addEventListener('click', (e) => {
+        const uploadLink = e.target.closest('#uploadLink');
+        if (uploadLink) {
+            e.preventDefault();
+            if (!currentUser) {
+                const dialog = new BsDialogs();
+                dialog.ok("Upload Restricted", "You cannot upload images because you are not logged in. Please sign in with Discord to continue.");
+                return;
+            }
+            if (typeof createUploadTest === 'function') createUploadTest();
         }
-        // Legacy upload trigger or custom one
-        if (typeof createUploadTest === 'function') createUploadTest();
     });
 }
 
@@ -217,7 +225,7 @@ function renderImageCard(container, url) {
     col.innerHTML = `
         <div class="card kawaii-card h-100">
             <div class="kawaii-card-img-wrapper">
-                <img src="${url}" class="card-img-top img-fluid" alt="Kawaii Image" style="object-fit: cover; height: 250px;" loading="lazy">
+                <img src="${url}" class="card-img-top" alt="Kawaii Image" loading="lazy">
             </div>
             <div class="kawaii-card-actions text-center">
                 <a href="${url}" target="_blank" class="btn btn-kawaii btn-sm">
@@ -315,7 +323,7 @@ function renderAdminCard(container, img) {
     col.innerHTML = `
         <div class="card kawaii-card h-100 border-warning" id="admin-card-${img.id}">
             <div class="kawaii-card-img-wrapper">
-                <img src="${img.link}" class="card-img-top" alt="Pending" style="object-fit: contain; height: 200px; background: #eee;">
+                <img src="${img.link}" class="card-img-top" alt="Pending" style="object-fit: contain; background: #eee;">
             </div>
             <div class="card-body">
                 <p class="small mb-1"><span class="badge bg-secondary">ID: ${img.id}</span></p>
@@ -357,29 +365,35 @@ async function moderateImage(id, action) {
 async function createUploadTest() {
     const dialog = new BsDialogs();
     
-    let categoriesHtml = sfwCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+    let sfwOptions = sfwCategories.map(cat => `<option value="${cat}">${cat} (SFW)</option>`).join('');
+    let nsfwOptions = nsfwCategories.map(cat => `<option value="${cat}">${cat} (NSFW)</option>`).join('');
     
     const formHtml = `
         <form id="upload-form">
             <div class="mb-3">
                 <label class="form-label">Category</label>
                 <select class="form-select" name="category" required>
-                    ${categoriesHtml}
+                    <optgroup label="SFW Categories">
+                        ${sfwOptions}
+                    </optgroup>
+                    <optgroup label="NSFW Categories">
+                        ${nsfwOptions}
+                    </optgroup>
                 </select>
             </div>
             <div class="mb-3">
                 <label class="form-label">Image File</label>
                 <input type="file" class="form-control" name="image" accept="image/*" required>
             </div>
-            <div class="small text-muted">
-                Note: Uploaded images will be reviewed by administrators.
+            <div class="small text-muted p-2 bg-light rounded border">
+                <i class="fas fa-info-circle me-1 text-primary"></i> 
+                Uploaded images will be reviewed by administrators before appearing in the public gallery.
             </div>
         </form>
     `;
 
     dialog.form("Upload Kawaii Image", "Upload Now", formHtml);
     
-    // Customize the behavior for file upload
     const form = document.body.querySelector('#upload-form');
     form.onsubmit = async (e) => {
         e.preventDefault();
@@ -390,9 +404,8 @@ async function createUploadTest() {
         okBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Uploading...';
 
         try {
-            const formData = new FormData();
-            formData.append('image', form.image.files[0]);
-            formData.append('category', form.category.value);
+            const formData = new FormData(form);
+            // Ensure userId is added if not in the form (currentUser is checked in the listener)
             formData.append('userId', currentUser.id);
 
             const res = await axios.post('/api/v1/upload', formData, {
@@ -402,13 +415,17 @@ async function createUploadTest() {
             if (res.data.success) {
                 dialog.close();
                 const successDialog = new BsDialogs();
-                await successDialog.ok("Success!", "Image uploaded successfully and is now pending approval.");
+                await successDialog.ok("Success! 🌸", "Your image has been uploaded successfully and is now pending approval from our moderators.");
             }
         } catch (err) {
             console.error("Upload failed:", err);
-            alert("Failed to upload image. Please try again.");
+            const errorMsg = err.response?.data?.error || "Failed to upload image. Please check your connection and try again.";
+            
             okBtn.disabled = false;
             okBtn.textContent = originalText;
+            
+            const errorDialog = new BsDialogs();
+            await errorDialog.ok("Upload Failed", errorMsg);
         }
     };
 }

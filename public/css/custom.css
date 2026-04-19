@@ -242,6 +242,9 @@ h1, h2, h3, h4, .navbar-brand {
     box-shadow: var(--shadow-soft);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 1px solid rgba(255, 93, 143, 0.08);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .kawaii-card:hover {
@@ -253,9 +256,14 @@ h1, h2, h3, h4, .navbar-brand {
 .kawaii-card-img-wrapper {
     overflow: hidden;
     background: #f7e8ef;
+    position: relative;
+    height: 280px; /* Consistent height for all images */
 }
 
 .kawaii-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     transition: transform 0.45s ease;
 }
 
@@ -264,7 +272,11 @@ h1, h2, h3, h4, .navbar-brand {
 }
 
 .kawaii-card-actions {
-    padding: 0.85rem;
+    padding: 1rem;
+    margin-top: auto; /* Push to bottom */
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(5px);
+    border-top: 1px solid rgba(255, 93, 143, 0.05);
 }
 
 /* ============================================
