@@ -48,7 +48,21 @@ export const getRandomImage = async (category: string) => {
         return { url: await getFreshUrl(firstEntry.link, firstEntry.id) };
     }
 
-    const { id, link } = JSON.parse(imageLink);
+    let id: number | undefined;
+    let link: string;
+
+    try {
+        const parsed = JSON.parse(imageLink);
+        id = parsed.id;
+        link = parsed.link;
+    } catch (e) {
+        // Fallback for old plain URL strings in the Redis pool
+        link = imageLink;
+        const [img] = await db.select({ id: images.id }).from(images).where(eq(images.link, link)).limit(1);
+        id = img?.id;
+    }
+
+    if (!id) return { url: link }; // If we can't find the ID, return the original link
     return { url: await getFreshUrl(link, id) };
 };
 
@@ -62,7 +76,7 @@ async function getFreshUrl(url: string, id: number): Promise<string> {
 
     const [refreshed] = await refreshDiscordUrl([url]);
     if (refreshed) {
-        await redis.setex(cacheKey, 82800, refreshed); // 23h
+        await redis.setex(cacheKey, 86400, refreshed); // 24h
         return refreshed;
     }
     return url;

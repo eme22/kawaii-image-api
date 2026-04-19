@@ -47,7 +47,7 @@ export async function imageRoutes(fastify: FastifyInstance) {
         if (!refreshed) return reply.redirect(image.link); // Fallback to original
 
         // 4. Cache and Redirect
-        await fastify.redis.setex(cacheKey, 82800, refreshed); // 23 hours cache
+        await fastify.redis.setex(cacheKey, 86400, refreshed); // 24h
         return reply.redirect(refreshed);
     });
 
