@@ -1,13 +1,16 @@
-FROM node:16
+FROM node:20-slim
 
 WORKDIR /app
 
-COPY package*.json ./
+# Enable corepack to use the built-in pnpm
+RUN corepack enable
 
-RUN npm install
+COPY package.json pnpm-lock.yaml* ./
+
+RUN pnpm install
 
 COPY . .
 
 EXPOSE 8000
 
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]

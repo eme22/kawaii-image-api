@@ -1,47 +1,51 @@
-import { MessageAttachment, User } from "discord.js";
-import { bot } from "..";
-import { getRepository } from "typeorm";
-import {SFW, NSFW, Image} from '../models'
-import { getAdmin } from "./user.repository";
+import { AttachmentBuilder } from "discord.js";
+import { db } from "../db/index.js";
+import { images, nsfwEnum } from "../db/schema.js";
+import { getAdmin } from "./user.repository.js";
 
 export interface IUploadPayload {
     userId: string;
-    category: SFW | NSFW;
-    data: File;
+    category: string;
 }
 
-export const uploadfile  = async (payload: IUploadPayload, buffer: Buffer, fileName: string) :Promise<Image | null> => {
-  
-    const imageRepository = getRepository(Image);
+/**
+ * Uploads a file record to the database and sends a notification to an admin via Discord.
+ */
+export const uploadfile = async (payload: IUploadPayload, buffer: Buffer, fileName: string, bot: any) => {
+    // Determine if NSFW based on category
+    const nsfwList = nsfwEnum as unknown as string[];
+    const isNsfw = nsfwList.includes(payload.category);
 
-    const image = new Image();
-    image.category = payload.category;
-    image.userId = payload.userId;
-    image.nsfw = (<any>Object).values(NSFW).includes(payload.category);
-    image.link = "";
+    const [data] = await db.insert(images)
+        .values({
+            userId: payload.userId,
+            category: payload.category,
+            nsfw: isNsfw,
+            link: "", // Will be filled after approval or stored as Discord link
+            aproved: false
+        })
+        .returning();
 
-
-    const data = await imageRepository.save({
-      ...image
-    })
-
-    await uploadToDiscord(buffer, data, fileName);
+    await uploadToDiscord(buffer, data, fileName, bot);
 
     return data;
-  }
+};
 
-const uploadToDiscord = async (data: Buffer, payload: Image, fileName: string) : Promise<string> => {
-
-    const admin = await getAdmin()
+const uploadToDiscord = async (data: Buffer, payload: any, fileName: string, bot: any): Promise<string> => {
+    const admin = await getAdmin();
+    if (!admin) return "";
     
-    //console.log("FILENAME: "+ fileName);
+    try {
+        const user = await bot.users.fetch(admin.id);
+        if (user) {
+            await user.send({ 
+                content: `${payload.id}@${payload.userId}@${payload.category}@${payload.nsfw}`,
+                files: [new AttachmentBuilder(data, { name: fileName })] 
+            });
+        }
+    } catch (error) {
+        console.error("Failed to send upload notification to admin:", error);
+    }
 
-    bot.users.fetch(admin.id).then((user: User) => {
-      user.send({ 
-        content: `${payload.id}@${payload.userId}@${payload.category}@${payload.nsfw}`,
-        files: [new MessageAttachment(data, fileName)] 
-      });
-     });
-
-    return `${admin}`;
-}
+    return `${admin.id}`;
+};

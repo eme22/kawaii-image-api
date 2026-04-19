@@ -64,45 +64,35 @@
             </div>
             <div id="layoutSidenav_content">
                 <main>
+                    <div class="container-fluid px-4">
+                        
+                        <!-- Admin Section (Hidden by default) -->
+                        <div id="admin-panel" class="mb-4 d-none">
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <i class="fas fa-shield-halved"></i> Admin Moderation
+                                </div>
+                                <div class="card-body">
+                                    <p>Review and approve pending uploads.</p>
+                                    <button class="btn btn-primary" id="view-pending-images">View Pending Images</button>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-md-4 mt-3 col-lg-4">
-                                <img id="gallery0" src="assets/img/cloading.gif" class="img-fluid" alt="image">
+                        <div class="row" id="image-gallery">
+                            <!-- Images will be injected here dynamically -->
+                            <div class="col-12 text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
                             </div>
-                            <div class="col-md-4 mt-3 col-lg-4">
-                                <img id="gallery1" src="assets/img/cloading.gif" class="img-fluid" alt="image">
-                            </div>
-                            <div class="col-md-4 mt-3 col-lg-4">
-                                <img id="gallery2" src="assets/img/cloading.gif" class="img-fluid" alt="image">
-                            </div>
-                            <div class="col-md-4 mt-3 col-lg-6">
-                                <img id="gallery3" src="assets/img/cloading.gif" class="img-fluid" alt="image">
-                            </div>
-                            <div class="col-md-4 mt-3 col-lg-6">
-                                <img id="gallery4" src="assets/img/cloading.gif" class="img-fluid" alt="image">
-                            </div>
-                            <div class="col-md-4 mt-3 col-lg-3">
-                                <img id="gallery5" src="assets/img/cloading.gif" class="img-fluid" alt="image">
-                            </div>
-                            <div class="col-md-4 mt-3 col-lg-3">
-                                <img id="gallery6" src="assets/img/cloading.gif" class="img-fluid" alt="image">
-                            </div>
-                            <div class="col-md-4 mt-3 col-lg-3">
-                                <img id="gallery7" src="assets/img/cloading.gif" class="img-fluid" alt="image">
-                            </div>
-                            <div class="col-md-4 mt-3 col-lg-3">
-                                <img id="gallery8" src="assets/img/cloading.gif" class="img-fluid" alt="image">
-                            </div>
-            
                         </div>
                     </div>
-                    
                 </main>
                 <footer class="py-4 bg-light mt-auto">
                     <div class="container-fluid px-4">
                         <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">No Copyright. Open Source</div>
+                            <div class="text-muted">Copyright &copy; 2026 eme22. Licensed under ISC</div>
                         </div>
                     </div>
                 </footer>

@@ -1,15 +1,17 @@
-FROM node:16-alpine AS builder
+FROM node:20-slim AS builder
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+RUN corepack enable
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 COPY . .
-RUN npm run build
+RUN pnpm run build
 
-FROM node:16-alpine AS server
+FROM node:20-slim AS server
 WORKDIR /app
-COPY package* ./
-RUN npm install --production
-COPY --from=builder ./app/public ./public
-COPY --from=builder ./app/build ./build
+RUN corepack enable
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --prod --frozen-lockfile
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/build ./build
 EXPOSE 8000
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]

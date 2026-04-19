@@ -1,373 +1,275 @@
+/**
+ * Kawaii API - Functional Scripts
+ */
 
-// 
-// Scripts
-// 
+let sfwCategories = [];
+let nsfwCategories = [];
+let currentUser = null;
 
-var sfw;
+// Initialize when DOM is ready
+window.addEventListener('DOMContentLoaded', () => {
+    initApp();
+});
 
-axios.get('/api/v1/endpoints/sfw')
-//.then(res => res.json())
-.then(response => { sfw = response.data; })
-.catch(err => {
-    console.log(err);
-})
-
-/*
-fetch('/api/v1/endpoints/sfw')
-    .then(res => res.json())
-    .then(out => { sfw = out; })
-    .catch(err => {
-        console.log(err);
-    })
-*/
-
-var nsfw;
-
-axios.get('/api/v1/endpoints/nsfw')
-//    .then(res => res.json())
-    .then(response => { nsfw = response.data; })
-    .catch(err => {
-        console.log(err);
-    })
-
-    /*
-fetch('/api/v1/endpoints/nsfw')
-    .then(res => res.json())
-    .then(out => { nsfw = out; })
-    .catch(err => {
-        console.log(err);
-    })
-*/
-
-window.addEventListener('DOMContentLoaded', _event => {
-
-    if (window.innerWidth < 922) {
-        document.body.classList.toggle('sb-sidenav-toggled');
+async function initApp() {
+    // 1. Initial State
+    setupSidebarToggle();
+    setupAuthListeners();
+    
+    // 2. Load Data
+    try {
+        await Promise.all([
+            fetchCategories(),
+            checkAuth()
+        ]);
+        
+        // 3. Render initial view (Waifu SFW by default)
+        loadGallery('sfw', 'waifu');
+    } catch (err) {
+        console.error("Initialization failed:", err);
     }
+}
 
-    if (sessionStorage.user) {
-        var user = JSON.parse(sessionStorage.user);
-        if (user) {
-            setlogged(user)
-        }
-    } else {
-        notlogged();
-    }
-
-
-    // Toggle the side navigation
+function setupSidebarToggle() {
     const sidebarToggle = document.body.querySelector('#sidebarToggle');
     if (sidebarToggle) {
-        // Uncomment Below to persist sidebar toggle between refreshes
-        // if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
-        //     document.body.classList.toggle('sb-sidenav-toggled');
-        // }
         sidebarToggle.addEventListener('click', event => {
             event.preventDefault();
             document.body.classList.toggle('sb-sidenav-toggled');
             localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
         });
     }
-
-    const menu_action = document.getElementById('usermenu-action');
-    if (menu_action) {
-        menu_action.addEventListener('click', event => {
-            event.preventDefault();
-            if (sessionStorage.user) {
-                logout()
-            } else {
-                createLogin()
-            }
-        })
-    }
-
-
-
-
-    for (let index = 0; index < 9; index++) {
-        const gallery = document.getElementById('gallery' + index);
-
-        axios.get('/api/v1/sfw/waifu')
-        .then(response => {
-            let data = response.data;
-            if (!data.message) {
-                gallery.setAttribute("src", data.url);
-                gallery.style.visibility = "visible";
-            }
-            else {
-                gallery.style.visibility = "hidden";
-            }
-        }).catch(e => {
-            console.log(e);
-            gallery.style.visibility = "hidden";
-        })
-        /*
-        fetch('/api/v1/sfw/waifu')
-            .then(result => result.json())
-            .then((output) => {
-                gallery.setAttribute("src", output.url)
-                if (!output.message) {
-                    gallery.style.visibility = "visible";
-                }
-                else {
-                    gallery.style.visibility = "hidden";
-                }
-            }).catch(err => {
-                console.log(err);
-                gallery.style.visibility = "hidden";
-            });*/
-
-
-    }
-
-    axios.get('/api/v1/user_data')
-//    .then(res => res.json())
-    .then(response => {
-        let out = response.data;
-        if (!out.message) {
-            setlogged(out)
-        }
-    })
-    .catch(() => { notlogged() });
-
-    /*
-    fetch('/api/v1/user_data')
-        .then(res => res.json())
-        .then(out => {
-            if (!out.message) {
-                setlogged(out)
-            }
-        })
-        .catch(() => { notlogged() });
-    */
-
-    const uploadL = document.getElementById('uploadLink');
-    uploadL.addEventListener('click', () => {
-        if (sessionStorage.user)
-            createUploadTest();
-        else
-            new BsDialogs().ok('Error', 'You must be logged to upload files ');
-    })
-});
-
-function notlogged() {
-    const sidenavfooter = document.getElementById("username");
-    sidenavfooter.innerHTML = "Not Logged";
-
-    const login = document.getElementById('usermenu-action');
-    login.innerHTML = "Login or Register";
 }
 
-function setlogged(user_data) {
+async function fetchCategories() {
+    const [sfwRes, nsfwRes] = await Promise.all([
+        axios.get('/api/v1/endpoints/sfw'),
+        axios.get('/api/v1/endpoints/nsfw')
+    ]);
+    
+    sfwCategories = sfwRes.data;
+    nsfwCategories = nsfwRes.data;
+    
+    renderCategoryMenu();
+}
 
-    sessionStorage.setItem('user', JSON.stringify(user_data));
+function renderCategoryMenu() {
+    const navContainer = document.querySelector('#sidenavAccordion .nav');
+    
+    // Clear existing menu after Home and Docs
+    const homeLink = navContainer.children[0].cloneNode(true);
+    const docsLink = navContainer.children[1].cloneNode(true);
+    const uploadLink = navContainer.children[2].cloneNode(true);
+    const githubLink = navContainer.children[3].cloneNode(true);
+    
+    navContainer.innerHTML = '';
+    navContainer.appendChild(homeLink);
+    navContainer.appendChild(docsLink);
+    
+    // SFW Section
+    const sfwHeader = document.createElement('div');
+    sfwHeader.className = 'sb-sidenav-menu-heading';
+    sfwHeader.textContent = 'SFW Categories';
+    navContainer.appendChild(sfwHeader);
+    
+    sfwCategories.forEach(cat => {
+        navContainer.appendChild(createCategoryLink('sfw', cat));
+    });
+    
+    // NSFW Section
+    const nsfwHeader = document.createElement('div');
+    nsfwHeader.className = 'sb-sidenav-menu-heading';
+    nsfwHeader.textContent = 'NSFW Categories';
+    navContainer.appendChild(nsfwHeader);
+    
+    nsfwCategories.forEach(cat => {
+        navContainer.appendChild(createCategoryLink('nsfw', cat));
+    });
+    
+    navContainer.appendChild(document.createElement('hr'));
+    navContainer.appendChild(uploadLink);
+    navContainer.appendChild(githubLink);
+}
 
-    const login = document.getElementById('usermenu-action');
-    login.setAttribute("data-bs-target", "");
-    login.innerHTML = "Logout";
+function createCategoryLink(type, category) {
+    const a = document.createElement('a');
+    a.className = 'nav-link category-link';
+    a.href = '#';
+    a.dataset.type = type;
+    a.dataset.category = category;
+    a.innerHTML = `<div class="sb-nav-link-icon"><i class="fas fa-tag"></i></div> ${category}`;
+    
+    a.addEventListener('click', (e) => {
+        e.preventDefault();
+        loadGallery(type, category);
+        if (window.innerWidth < 992) {
+            document.body.classList.add('sb-sidenav-toggled');
+        }
+    });
+    
+    return a;
+}
 
-    const sidenavfooter = document.getElementById("username");
-    sidenavfooter.innerHTML = user_data.name;
+async function checkAuth() {
+    try {
+        const response = await axios.get('/api/v1/user_data');
+        currentUser = response.data;
+        if (currentUser && !currentUser.message) {
+            setLogged(currentUser);
+        } else {
+            setNotLogged();
+        }
+    } catch (err) {
+        setNotLogged();
+    }
+}
 
-    login.addEventListener('click', () => {
-        logout();
+function setLogged(user) {
+    const loginBtn = document.getElementById('usermenu-action');
+    loginBtn.textContent = 'Logout';
+    loginBtn.dataset.action = 'logout';
+    
+    document.getElementById('username').textContent = user.name;
+    
+    if (user.admin) {
+        const adminPanel = document.getElementById('admin-panel');
+        adminPanel.classList.remove('d-none');
+        setupAdminListeners();
+    }
+}
+
+function setNotLogged() {
+    const loginBtn = document.getElementById('usermenu-action');
+    loginBtn.textContent = 'Login with Discord';
+    loginBtn.dataset.action = 'login';
+    document.getElementById('username').textContent = 'Not Logged';
+    document.getElementById('admin-panel').classList.add('d-none');
+}
+
+function setupAuthListeners() {
+    const loginBtn = document.getElementById('usermenu-action');
+    loginBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (loginBtn.dataset.action === 'login') {
+            window.location.href = "/auth/discord";
+        } else {
+            axios.get('/logout').then(() => window.location.reload());
+        }
     });
 
-
-}
-
-function logout() {
-
-    axios.get('/logout')
-        .then(() => window.location.reload())
-/*
-    fetch('/logout')
-        .then(() => window.location.reload())
-*/
-    sessionStorage.removeItem('user')
-}
-
-function createLogin() {
-    let ret = new BsDialogs().custom(
-        '<i class="fa-brands fa-discord"></i> Login or Register with Discord', '',
-        [['Cancel', 'btn-secondary', 'abort'], ['Login', 'btn-primary', 'yes']]
-    ).then(
-        function (value) {
-            if (value == 'yes') {
-                window.location.href = "/auth/discord";
-            }
-        },
-        function (error) {
-            console.log(error)
+    document.getElementById('uploadLink').addEventListener('click', () => {
+        if (!currentUser) {
+            alert("You must be logged in to upload!");
+            return;
         }
-    );
+        // Legacy upload trigger or custom one
+        if (typeof createUploadTest === 'function') createUploadTest();
+    });
 }
 
-function createUploadTest() {
+function setupAdminListeners() {
+    document.getElementById('view-pending-images').addEventListener('click', () => {
+        loadPendingImages();
+    });
+}
 
-    var enlist = ''
-    for (var i = 0, l = sfw.length; i < l; i++) {
-        ;
-        enlist += '<option value=\'{"nsfw": false,"category": "' + sfw[i] + '"}\'>SFW - ' + sfw[i] + '</option>';
+async function loadGallery(type, category) {
+    const gallery = document.getElementById('image-gallery');
+    
+    gallery.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>';
+    
+    try {
+        // Fetch multiple images for variety
+        const requests = Array.from({ length: 12 }, () => axios.get(`/api/v1/${type}/${category}`));
+        const results = await Promise.allSettled(requests);
+        
+        gallery.innerHTML = '';
+        results.forEach(res => {
+            if (res.status === 'fulfilled' && res.value.data && res.value.data.url) {
+                renderImageCard(gallery, res.value.data.url);
+            }
+        });
+        
+        if (gallery.innerHTML === '') {
+            gallery.innerHTML = '<div class="col-12 text-center py-5"><h3>No images found in this category.</h3></div>';
+        }
+    } catch (err) {
+        gallery.innerHTML = '<div class="col-12 text-center py-5 text-danger"><h3>Error loading gallery.</h3></div>';
     }
-
-    for (var i = 0, l = nsfw.length; i < l; i++) {
-        enlist += '<option value=\'{"nsfw": true,"category": "' + nsfw[i] + '"}\'>NSFW - ' + nsfw[i] + '</option>';
-    }
-
-
-
-    let frm = `<form>
-    <div class="mb-3">
-    <label for="formFileSm" class="form-label">Select your files (only images and gifs will be accepted): </label>
-    <input class="form-control form-control-sm"
-    data-name="file" id="generatedFile" accept=".gif,.jpg,.jpeg,.png" type="file" multiple required>
-</div>
-</div>
-<select id="generatedEndpoints" data-name="endpoint" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" required>
-<option value="" selected disabled>Select Endpoint</option>
-`;
-    frm += enlist;
-    frm += `</select>
-  </form>`
-
-    let dlg = new BsDialogs()
-    dlg.form('<i class="fa fa-upload"></i> Upload Image', 'Upload', frm)
-
-    async function waitForElement() {
-        let ret = await dlg.onsubmit(true);
-        if (ret) {
-            var data = document.getElementById('generatedFile').files;
-            var endpoint = document.getElementById('generatedEndpoints').value;
-
-            if (data.length > 50) {
-                new BsDialogs().ok('Error', 'You cannot submit more than 50 files per upload, let the admins rest a little!');
-                return;
-            }
-
-            var error = new Array();
-            for (let index = 0; index < data.length; index++) {
-                var size = parseFloat(data[index].size / 1024 / 1024).toFixed(2);
-                if (size > 8) {
-                    error.push(data[index].name);
-                }
-            }
-            if (error.length > 0) {
-
-                let errBody = 'File must not exceed 8 MB, Files: ';
-
-                for (let index = 0; index < error.length; index++) {
-                    errBody += error[index] +"\n"
-                }
-
-                new BsDialogs().ok('Error', errBody);
-            }
-            else {
-                submitData(data, endpoint, (success, failed) => {
-                    if (success) {
-                        dlg.close()
-                        new BsDialogs().custom('<div id="generatedUploadingHeader">Uploading...</div>', '<div id="generatedUploadingBody">Wait before all the images are uploaded</div>')
-                    }
-                    else {
-                        if (failed.length > 0) {
-
-                            var failedb = 'Some of you files couldnt be uploaded, Files: '
-
-                            for (let index = 0; index < failed.length; index++) {
-                                failedb += failed[index] + "\n";
-                                
-                            }
-
-                            new BsDialogs().ok('Error',  failedb);
-                        }
-                        else {
-                            new BsDialogs().ok('Error', 'You must be logged to upload files');
-                        }
-                        
-                    }
-                })
-
-            }
-        }
-        else if (ret === undefined) {
-            dlg.close()
-        }
-        else {
-            new BsDialogs().ok('Error', 'WTF');
-        }
-
-    }
-
-    waitForElement();
-
 }
 
-function submitData(files, endpoint, callback) {
+function renderImageCard(container, url) {
+    const col = document.createElement('div');
+    col.className = 'col-sm-6 col-md-4 col-lg-3 mb-4';
+    col.innerHTML = `
+        <div class="card h-100 shadow-sm">
+            <img src="${url}" class="card-img-top img-fluid rounded" alt="Kawaii Image" style="object-fit: cover; height: 250px;" loading="lazy">
+            <div class="card-body p-2 text-center">
+                <a href="${url}" target="_blank" class="btn btn-sm btn-outline-primary">View Full</a>
+            </div>
+        </div>
+    `;
+    container.appendChild(col);
+}
 
-
-    if (sessionStorage.user) {
-        var user_data = JSON.parse(sessionStorage.user);
-        var object_data = JSON.parse(endpoint);
-
-        var failed = new Array();
-        //var failed = [];
-
-        let finished = 0;
-
-        for (let index = 0; index < files.length; index++) {
-            const file = files[index];
-
-            var fd = new FormData();
-            fd.append('data', file)
-            fd.append('userId', user_data.id)
-            fd.append('category', object_data.category);
-
-            axios.post('api/v1/upload', fd, {
-                timeout: 1000000
-            }).then(() => {
-                finished++;
-                var header = document.getElementById('generatedUploadingHeader')
-                var body = document.getElementById('generatedUploadingBody')
-
-                if (header && body) {
-                    header.innerHTML = 'Upload Success '+(finished)+'/'+(files.length)+'!'
-                    body.innerHTML = 'You must wait before an admin can aprove your image'
-                }
-                else new BsDialogs().custom('<div id="generatedUploadingHeader">Upload Success '+(finished)+'/'+(files.length)+'!</div>', '<div id="generatedUploadingBody">You must wait before an admin can aprove your image</div>')
-            } ).catch(err => {
-                console.log(err);
-                failed.push(file.name);
-            });
-
-            /*
-            fetch('api/v1/upload', {
-                method: 'post',
-                body: fd,
-            }).then(() => {
-                finished++;
-                var header = document.getElementById('generatedUploadingHeader')
-                var body = document.getElementById('generatedUploadingBody')
-
-                if (header && body) {
-                    header.innerHTML = 'Upload Success '+(finished)+'/'+(files.length)+'!'
-                    body.innerHTML = 'You must wait before an admin can aprove your image'
-                }
-                else new BsDialogs().custom('<div id="generatedUploadingHeader">Upload Success '+(finished)+'/'+(files.length)+'!</div>', '<div id="generatedUploadingBody">You must wait before an admin can aprove your image</div>')
-            } ).catch(err => {
-                console.log(err);
-                failed.push(file.name);
-            });
-            */
-            
+async function loadPendingImages() {
+    const gallery = document.getElementById('image-gallery');
+    
+    gallery.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>';
+    
+    try {
+        const response = await axios.get('/api/v1/admin/pending');
+        const images = response.data;
+        
+        gallery.innerHTML = '';
+        if (images.length === 0) {
+            gallery.innerHTML = '<div class="col-12 text-center py-5"><h3>No pending images! Good job.</h3></div>';
+            return;
         }
+        
+        images.forEach(img => {
+            renderAdminCard(gallery, img);
+        });
+    } catch (err) {
+        gallery.innerHTML = '<div class="col-12 text-center py-5 text-danger"><h3>Failed to load pending images.</h3></div>';
+    }
+}
 
-        if (failed.length == 0) {
-            callback(true);
-        } else {
-            callback(false, failed);
-        }
+function renderAdminCard(container, img) {
+    const col = document.createElement('div');
+    col.className = 'col-md-6 col-lg-4 mb-4';
+    col.innerHTML = `
+        <div class="card h-100 border-warning shadow-sm" id="admin-card-${img.id}">
+            <img src="${img.link}" class="card-img-top" alt="Pending" style="object-fit: contain; height: 200px; background: #eee;">
+            <div class="card-body">
+                <p class="small mb-1"><strong>ID:</strong> ${img.id}</p>
+                <p class="small mb-1"><strong>Category:</strong> ${img.category} (${img.nsfw ? 'NSFW' : 'SFW'})</p>
+                <p class="small mb-2"><strong>User:</strong> ${img.userId}</p>
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-success btn-sm approve-btn" data-id="${img.id}">Approve</button>
+                    <button class="btn btn-danger btn-sm reject-btn" data-id="${img.id}">Reject</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    col.querySelector('.approve-btn').addEventListener('click', () => moderateImage(img.id, 'approve'));
+    col.querySelector('.reject-btn').addEventListener('click', () => moderateImage(img.id, 'reject'));
+    
+    container.appendChild(col);
+}
 
-    } else {
-        callback(false)
+async function moderateImage(id, action) {
+    try {
+        const url = action === 'approve' ? `/api/v1/admin/approve/${id}` : `/api/v1/admin/reject/${id}`;
+        const method = action === 'approve' ? 'post' : 'delete';
+        
+        await axios({ method, url });
+        
+        const card = document.getElementById(`admin-card-${id}`);
+        card.parentElement.classList.add('fade-out');
+        setTimeout(() => card.parentElement.remove(), 500);
+    } catch (err) {
+        alert(`Failed to ${action} image.`);
     }
 }

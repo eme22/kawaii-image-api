@@ -2,67 +2,55 @@
   "name": "kawaii-image-api",
   "version": "0.1.0",
   "description": "REST API to serve different images or gifs from animes",
+  "pnpm": {
+    "overrides": {
+      "@fastify/static": "9.1.0"
+    }
+  },
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node build/index.js",
-    "predev": "npm run swagger",
-    "prebuild": "npm run swagger",
     "build": "tsc",
-    "dev": "concurrently \"nodemon\" \"nodemon -x tsoa spec\"",
-    "swagger": "tsoa spec",
+    "dev": "tsx watch src/index.ts",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
     "test": "jest"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eme22/kawaii-image-api.git"
   },
-  "keywords": [],
   "author": "eme22",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/eme22/kawaii-image-api/issues"
-  },
-  "homepage": "https://github.com/eme22/kawaii-image-api#readme",
   "devDependencies": {
-    "@types/express": "^4.17.13",
-    "@types/express-session": "^1.17.0",
-    "@types/jest": "^27.4.1",
-    "@types/morgan": "^1.9.3",
-    "@types/multer": "^1.4.7",
-    "@types/node": "^17.0.21",
-    "@types/passport": "^1.0.7",
-    "@types/swagger-ui-express": "^4.1.3",
-    "concurrently": "^7.0.0",
-    "jest": "^27.5.1",
-    "nodemon": "^2.0.15",
-    "ts-jest": "^27.1.3",
-    "typescript": "^4.6.2"
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.19",
+    "@types/pg": "^8.20.0",
+    "drizzle-kit": "^0.30.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@discordx/importer": "^1.1.2",
-    "@oauth-everything/passport-discord": "^1.0.2",
-    "axios": "^0.27.2",
-    "discord.js": "^13.6.0",
-    "discordx": "^9.5.3",
-    "dotenv": "^16.0.0",
-    "express": "^4.18.1",
-    "express-session": "^1.17.2",
-    "morgan": "^1.10.0",
-    "multer": "^1.4.4",
-    "passport": "^0.5.2",
-    "reflect-metadata": "^0.1.13",
-    "swagger-ui-express": "^4.3.0",
-    "tsoa": "^3.2.1",
-    "typeorm": "^0.2.44"
-  },
-  "nodemonConfig": {
-    "watch": [
-      "src"
-    ],
-    "ext": "ts",
-    "exec": "ts-node src/index.ts"
-  },
-  "swagger": {
-    "basePath": "adada"
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^10.0.0",
+    "@fastify/multipart": "^10.0.0",
+    "@fastify/oauth2": "^8.2.0",
+    "@fastify/redis": "^7.0.0",
+    "@fastify/session": "^11.0.0",
+    "@fastify/static": "9.1.0",
+    "@fastify/swagger": "^9.0.0",
+    "@scalar/fastify-api-reference": "^1.25.120",
+    "axios": "^1.6.7",
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.39.0",
+    "fastify": "^5.0.0",
+    "fastify-type-provider-zod": "^4.0.0",
+    "ioredis": "^5.10.1",
+    "pg": "^8.20.0",
+    "zod": "^3.23.0"
   }
 }
