@@ -5,6 +5,8 @@
 let sfwCategories = [];
 let nsfwCategories = [];
 let currentUser = null;
+let currentAdminPage = 1;
+const adminLimit = 12;
 
 // Initialize when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
@@ -169,7 +171,7 @@ function setupAuthListeners() {
 
 function setupAdminListeners() {
     document.getElementById('view-pending-images').addEventListener('click', () => {
-        loadPendingImages();
+        loadPendingImages(1);
     });
 }
 
@@ -212,14 +214,17 @@ function renderImageCard(container, url) {
     container.appendChild(col);
 }
 
-async function loadPendingImages() {
+async function loadPendingImages(page = 1) {
     const gallery = document.getElementById('image-gallery');
+    const pagination = document.getElementById('pagination-controls');
     
+    currentAdminPage = page;
     gallery.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>';
+    pagination.innerHTML = ''; 
     
     try {
-        const response = await axios.get('/api/v1/admin/pending');
-        const images = response.data;
+        const response = await axios.get(`/api/v1/admin/pending?page=${page}&limit=${adminLimit}`);
+        const { data: images, total } = response.data;
         
         gallery.innerHTML = '';
         if (images.length === 0) {
@@ -230,9 +235,63 @@ async function loadPendingImages() {
         images.forEach(img => {
             renderAdminCard(gallery, img);
         });
+
+        renderPagination(total, page, adminLimit);
     } catch (err) {
         gallery.innerHTML = '<div class="col-12 text-center py-5 text-danger"><h3>Failed to load pending images.</h3></div>';
     }
+}
+
+function renderPagination(total, currentPage, limit) {
+    const container = document.getElementById('pagination-controls');
+    const totalPages = Math.ceil(total / limit);
+    
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = `
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-lg shadow-sm">
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${currentPage - 1}"><i class="fas fa-chevron-left"></i> Previous</a>
+                </li>
+    `;
+
+    for (let i = 1; i <= totalPages; i++) {
+        // Show current, first, last, and one neighbor
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+            html += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                </li>
+            `;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+            html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+    }
+
+    html += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${currentPage + 1}">Next <i class="fas fa-chevron-right"></i></a>
+                </li>
+            </ul>
+        </nav>
+    `;
+
+    container.innerHTML = html;
+
+    container.querySelectorAll('.page-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const page = parseInt(e.currentTarget.dataset.page);
+            if (!isNaN(page)) {
+                loadPendingImages(page);
+                document.getElementById('layoutSidenav_content').scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    });
 }
 
 function renderAdminCard(container, img) {

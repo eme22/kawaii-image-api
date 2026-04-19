@@ -125,10 +125,17 @@ export const createImage = async (payload: IImagePayload, nsfw: boolean, categor
 };
 
 /**
- * Gets all images pending for approval from the bot/database with pagination.
+ * Gets all images pending for approval from the bot/database with pagination and metadata.
  */
 export const getPendingImages = async (bot: any, page: number = 1, limit: number = 10) => {
     const offset = (page - 1) * limit;
+
+    // Get total count for pagination
+    const [countResult] = await db.select({ count: sql<number>`count(*)` })
+        .from(images)
+        .where(eq(images.aproved, false));
+    
+    const total = Number(countResult?.count || 0);
 
     const pending = await db.select()
         .from(images)
@@ -136,7 +143,7 @@ export const getPendingImages = async (bot: any, page: number = 1, limit: number
         .limit(limit)
         .offset(offset);
 
-    const result = await Promise.all(pending.map(async (img) => {
+    const data = await Promise.all(pending.map(async (img) => {
         // Check Redis cache first to avoid redundant Discord API calls
         const cacheKey = `pending_url:${img.id}`;
         const cached = await redis.get(cacheKey);
@@ -152,7 +159,7 @@ export const getPendingImages = async (bot: any, page: number = 1, limit: number
                 
                 if (attachment) {
                     const url = attachment.url;
-                    // Cache for 24 hours (Discord URLs typically last a while but refresh is needed)
+                    // Cache for 24 hours
                     await redis.setex(cacheKey, 86400, url); 
                     return { ...img, link: url };
                 }
@@ -164,7 +171,12 @@ export const getPendingImages = async (bot: any, page: number = 1, limit: number
         return img;
     }));
 
-    return result;
+    return {
+        data,
+        total,
+        page,
+        limit
+    };
 };
 
 /**

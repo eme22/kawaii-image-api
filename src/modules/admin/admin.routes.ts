@@ -15,8 +15,25 @@ export async function adminRoutes(fastify: FastifyInstance, options: any) {
             description: "Get all pending images with pagination",
             querystring: z.object({
                 page: z.string().optional().default("1").transform(Number),
-                limit: z.string().optional().default("10").transform(Number)
-            })
+                limit: z.string().optional().default("12").transform(Number)
+            }),
+            response: {
+                200: z.object({
+                    data: z.array(z.object({
+                        id: z.number(),
+                        userId: z.string(),
+                        category: z.string(),
+                        nsfw: z.boolean(),
+                        aproved: z.boolean(),
+                        link: z.string(),
+                        discordMessageId: z.string().nullable(),
+                        adminId: z.string().nullable()
+                    })),
+                    total: z.number(),
+                    page: z.number(),
+                    limit: z.number()
+                })
+            }
         }
     }, async (request) => {
         const { page, limit } = request.query as any;
